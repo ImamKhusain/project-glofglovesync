@@ -17,4 +17,9 @@ class LaporanProduksi extends Model
         'jumlah_produksi',
         'is_published',
     ];
+
+    public function karyawanDashboard()
+    {
+        return $this->belongsTo(KaryawanDashboard::class);
+    }
 }

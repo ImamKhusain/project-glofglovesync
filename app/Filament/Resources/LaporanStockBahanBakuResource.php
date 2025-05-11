@@ -16,8 +16,8 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 class LaporanStockBahanBakuResource extends Resource
 {
     protected static ?string $model = LaporanStockBahanBaku::class;
-
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationLabel = 'Laporan Stok Bahan Baku';
+    protected static ?string $navigationIcon = 'heroicon-o-cube';
 
     public static function form(Form $form): Form
     {
@@ -25,19 +25,24 @@ class LaporanStockBahanBakuResource extends Resource
             ->schema([
                 Forms\Components\TextInput::make('id_bahan_baku')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('ID Bahan Baku'),
                 Forms\Components\TextInput::make('nama_bahan_baku')
                     ->required()
-                    ->maxLength(255),
+                    ->maxLength(255)
+                    ->label('Nama Bahan Baku'),
                 Forms\Components\TextInput::make('stok_awal')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->label('Stok Awal'),
                 Forms\Components\TextInput::make('stok_terpakai')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->label('Stok Terpakai'),
                 Forms\Components\TextInput::make('stok_sisa')
                     ->required()
-                    ->numeric(),
+                    ->numeric()
+                    ->label('Stok Sisa'),
             ]);
     }
 
@@ -45,26 +50,33 @@ class LaporanStockBahanBakuResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->numeric()
+                    ->sortable()
+                    ->label('No'),
                 Tables\Columns\TextColumn::make('id_bahan_baku')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('ID Bahan Baku'),
                 Tables\Columns\TextColumn::make('nama_bahan_baku')
-                    ->searchable(),
+                    ->searchable()
+                    ->label('Nama Bahan Baku'),
                 Tables\Columns\TextColumn::make('stok_awal')
                     ->numeric()
-                    ->sortable(),
+                    ->label('Stok Awal')
+                    ->formatStateUsing(fn($state) => $state . ' meter'),
                 Tables\Columns\TextColumn::make('stok_terpakai')
                     ->numeric()
-                    ->sortable(),
+                    ->label('Stok Terpakai')
+                    ->formatStateUsing(fn($state) => $state . ' meter'),
                 Tables\Columns\TextColumn::make('stok_sisa')
                     ->numeric()
-                    ->sortable(),
+                    ->label('Stok Sisa')
+                    ->formatStateUsing(fn($state) => $state . ' meter'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
-                    ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
@@ -90,7 +102,7 @@ class LaporanStockBahanBakuResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListLaporanStockBahanBakus::route('/'),
+            'index' => Pages\ListLaporanStockBahanBaku::route('/'),
             'create' => Pages\CreateLaporanStockBahanBaku::route('/create'),
             'edit' => Pages\EditLaporanStockBahanBaku::route('/{record}/edit'),
         ];

@@ -6,7 +6,7 @@ use App\Filament\Resources\LaporanProduksiResource;
 use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
-class ListLaporanProduksis extends ListRecords
+class ListLaporanProduksi extends ListRecords
 {
     protected static string $resource = LaporanProduksiResource::class;
 
