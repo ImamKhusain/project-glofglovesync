@@ -10,10 +10,21 @@ class ListLaporanProduksi extends ListRecords
 {
     protected static string $resource = LaporanProduksiResource::class;
 
+
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label('INPUT'),
         ];
+    }
+
+    public function getHeading(): string
+    {
+        return 'Laporan Produksi';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Laporan Produksi';
     }
 }

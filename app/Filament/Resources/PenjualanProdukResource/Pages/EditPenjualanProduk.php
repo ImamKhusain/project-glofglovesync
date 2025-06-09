@@ -16,4 +16,14 @@ class EditPenjualanProduk extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getHeading(): string
+    {
+        return 'Edit Penjualan Produk';
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Edit';
+    }
 }

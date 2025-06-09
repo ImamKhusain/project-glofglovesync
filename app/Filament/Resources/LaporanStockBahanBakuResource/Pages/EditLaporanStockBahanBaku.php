@@ -16,4 +16,14 @@ class EditLaporanStockBahanBaku extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getHeading(): string
+    {
+        return 'Edit Laporan Stock Bahan Baku';
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Edit';
+    }
 }

@@ -13,7 +13,17 @@ class ListBahanProdukMasuk extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label('INPUT'),
         ];
+    }
+
+    public function getHeading(): string
+    {
+        return 'Bahan Baku Masuk';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Bahan Baku Masuk';
     }
 }

@@ -19,7 +19,6 @@ return new class extends Migration
             $table->integer('produksi_gagal');
             $table->integer('jumlah_produksi');
             $table->boolean('is_published')->default(0);
-            $table->timestamp('published_at')->nullable();
             $table->timestamps();
         });
     }

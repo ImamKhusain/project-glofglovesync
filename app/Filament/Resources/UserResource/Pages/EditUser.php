@@ -16,4 +16,14 @@ class EditUser extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getHeading(): string
+    {
+        return 'Edit User';
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Edit';
+    }
 }

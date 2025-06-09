@@ -3,22 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LaporanProduksiResource\Pages;
-use App\Filament\Resources\LaporanProduksiResource\RelationManagers;
 use App\Models\LaporanProduksi;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LaporanProduksiResource extends Resource
 {
     protected static ?string $model = LaporanProduksi::class;
-    protected static ?string $navigationLabel = 'Laporan Produksi';
-
+    protected static ?string $navigationLabel = 'Produksi';
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static ?string $slug = 'laporan-produksi';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -27,9 +26,6 @@ class LaporanProduksiResource extends Resource
                 Forms\Components\DateTimePicker::make('tanggal_produksi')
                     ->required()
                     ->label('Tanggal Produksi'),
-                Forms\Components\Toggle::make('is_published')
-                    ->required()
-                    ->label('Is Published'),
                 Forms\Components\TextInput::make('target_produksi')
                     ->required()
                     ->numeric()
@@ -46,12 +42,17 @@ class LaporanProduksiResource extends Resource
                     ->required()
                     ->numeric()
                     ->label('Jumlah Produksi'),
+                Forms\Components\Toggle::make('is_published')
+                    ->required()
+                    ->label('Status'),
             ]);
     }
 
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Tidak ada laporan produksi')
+            ->emptyStateDescription('Segera input laporan produksi untuk ditampilkan di sini.')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
@@ -79,25 +80,30 @@ class LaporanProduksiResource extends Resource
                     ->numeric()
                     ->label('Jumlah Produksi')
                     ->formatStateUsing(fn($state) => $state . ' pcs'),
-                Tables\Columns\IconColumn::make('is_published')
-                    ->boolean()
-                    ->label('Is Published'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Created At'),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Updated At'),
+                Tables\Columns\TextColumn::make('is_published')
+                    ->searchable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        '0' => 'warning',
+                        '1' => 'success',
+                    })
+                    ->formatStateUsing(fn($state): string => $state === 1 ? 'Terkirim' : 'Belum Terkirim')
+                    ->label('Status'),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('toggleStatus')
+                    ->icon('heroicon-m-paper-airplane')
+                    ->label(fn($record) => $record->is_published ? 'Batal' : 'Kirim')
+                    ->action(function ($record) {
+                        $record->is_published = !$record->is_published;
+                        $record->save();
+                    })
+                    ->color(fn($record) => $record->is_published === 0 ? 'bg-red-500' : 'bg-green-500'),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -121,5 +127,15 @@ class LaporanProduksiResource extends Resource
             'create' => Pages\CreateLaporanProduksi::route('/create'),
             'edit' => Pages\EditLaporanProduksi::route('/{record}/edit'),
         ];
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return 'Laporan Produksi';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

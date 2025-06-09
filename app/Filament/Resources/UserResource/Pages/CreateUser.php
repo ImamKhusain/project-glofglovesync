@@ -9,4 +9,19 @@ use Filament\Resources\Pages\CreateRecord;
 class CreateUser extends CreateRecord
 {
     protected static string $resource = UserResource::class;
+
+    public function getHeading(): string
+    {
+        return 'Input User';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Input User';
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Input';
+    }
 }

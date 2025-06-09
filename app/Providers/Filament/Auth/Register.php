@@ -2,9 +2,10 @@
 
 namespace App\Providers\Filament\Auth;
 
-use Filament\Forms\Components\Select;
+use App\Models\User;
 use Filament\Forms\Form;
 use Filament\Pages\Auth\Register as RegisterPage;
+use Illuminate\Auth\Events\Registered;
 
 class Register extends RegisterPage
 {
@@ -15,17 +16,21 @@ class Register extends RegisterPage
             $this->getEmailFormComponent(),
             $this->getPasswordFormComponent(),
             $this->getPasswordConfirmationFormComponent(),
-
-            Select::make('role')
-                ->label('Role')
-                ->required()
-                ->options([
-                    'user' => 'User',
-                    'admin' => 'Admin',
-                    'superadmin' => 'Super Admin'
-                ]),
         ])
-        ->statePath('data');
+            ->statePath('data');
+    }
+
+    protected function handleRegistration(array $data): User
+    {
+        // Buat user seperti biasa, tanpa data role
+        $user = static::getUserModel()::create($data);
+
+        // Setelah user berhasil dibuat, tetapkan role-nya.
+        // Pastikan role 'guest' sudah ada di tabel 'roles' kamu.
+        $user->assignRole('guest');
+
+        event(new Registered($user));
+
+        return $user;
     }
 }
-                    

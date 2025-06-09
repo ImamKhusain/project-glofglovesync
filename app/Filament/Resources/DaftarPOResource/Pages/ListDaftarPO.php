@@ -13,7 +13,17 @@ class ListDaftarPO extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label("INPUT"),
         ];
+    }
+
+    public function getHeading(): string
+    {
+        return 'Daftar PO';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Daftar PO';
     }
 }

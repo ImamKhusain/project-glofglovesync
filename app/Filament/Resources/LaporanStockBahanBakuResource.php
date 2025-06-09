@@ -3,21 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\LaporanStockBahanBakuResource\Pages;
-use App\Filament\Resources\LaporanStockBahanBakuResource\RelationManagers;
 use App\Models\LaporanStockBahanBaku;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class LaporanStockBahanBakuResource extends Resource
 {
     protected static ?string $model = LaporanStockBahanBaku::class;
-    protected static ?string $navigationLabel = 'Laporan Stok Bahan Baku';
+    protected static ?string $navigationLabel = 'Stok Bahan';
     protected static ?string $navigationIcon = 'heroicon-o-cube';
+    protected static ?string $slug = 'laporan-stock-bahan-baku';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -49,6 +49,8 @@ class LaporanStockBahanBakuResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Tidak ada laporan stock bahan baku')
+            ->emptyStateDescription('Segera input laporan stock bahan baku untuk ditampilkan di sini.')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
@@ -70,20 +72,31 @@ class LaporanStockBahanBakuResource extends Resource
                     ->formatStateUsing(fn($state) => $state . ' meter'),
                 Tables\Columns\TextColumn::make('stok_sisa')
                     ->numeric()
-                    ->label('Stok Sisa')
-                    ->formatStateUsing(fn($state) => $state . ' meter'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->toggleable(isToggledHiddenByDefault: true),
+                    ->label('Stok Sisa'),
+                Tables\Columns\TextColumn::make('status')
+                    ->searchable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        '0' => 'warning',
+                        '1' => 'success',
+                    })
+                    ->formatStateUsing(fn($state): string => $state === 1 ? 'Diterima' : 'Belum Diterima')
+                    ->label('Status'),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('toggleStatus')
+                    ->icon('heroicon-m-paper-airplane')
+                    ->label(fn($record) => $record->status ? 'Batal' : 'Terima')
+                    ->action(function ($record) {
+                        $record->status = !$record->status;
+                        $record->save();
+                    })
+                    ->color(fn($record) => $record->status === 0 ? 'bg-red-500' : 'bg-green-500'),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -106,5 +119,15 @@ class LaporanStockBahanBakuResource extends Resource
             'create' => Pages\CreateLaporanStockBahanBaku::route('/create'),
             'edit' => Pages\EditLaporanStockBahanBaku::route('/{record}/edit'),
         ];
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return 'Laporan Stock Bahan Baku';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

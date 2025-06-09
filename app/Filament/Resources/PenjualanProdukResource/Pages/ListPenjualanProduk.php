@@ -13,7 +13,17 @@ class ListPenjualanProduk extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            Actions\CreateAction::make()->label('INPUT'),
         ];
+    }
+
+    public function getHeading(): string
+    {
+        return 'Penjualan Produk';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Penjualan Produk';
     }
 }

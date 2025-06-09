@@ -16,4 +16,14 @@ class EditDaftarPO extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getHeading(): string
+    {
+        return 'Edit Daftar PO';
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Edit';
+    }
 }

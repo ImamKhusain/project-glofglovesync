@@ -3,21 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PenjualanProdukResource\Pages;
-use App\Filament\Resources\PenjualanProdukResource\RelationManagers;
 use App\Models\PenjualanProduk;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PenjualanProdukResource extends Resource
 {
     protected static ?string $model = PenjualanProduk::class;
     protected static ?string $navigationLabel = 'Ekspor';
     protected static ?string $navigationIcon = 'heroicon-o-arrow-up-on-square';
+    protected static ?string $slug = 'penjualan-produk';
+    protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
     {
@@ -34,9 +34,12 @@ class PenjualanProdukResource extends Resource
                     ->required()
                     ->numeric()
                     ->label('Jumlah Pengiriman'),
-                Forms\Components\TextInput::make('status_pengiriman')
+                Forms\Components\TextInput::make('tujuan_pengiriman')
                     ->required()
                     ->maxLength(255)
+                    ->label('Tujuan Pengiriman'),
+                Forms\Components\Toggle::make('status_pengiriman')
+                    ->required()
                     ->label('Status Pengiriman'),
                 Forms\Components\TextInput::make('review')
                     ->required()
@@ -48,6 +51,8 @@ class PenjualanProdukResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Tidak ada penjualan produk')
+            ->emptyStateDescription('Segera input penjualan produk untuk ditampilkan di sini.')
             ->columns([
                 Tables\Columns\TextColumn::make('id_pengiriman')
                     ->searchable()
@@ -62,26 +67,36 @@ class PenjualanProdukResource extends Resource
                     ->sortable()
                     ->label('Jumlah Pengiriman')
                     ->formatStateUsing(fn($state) => $state . ' pcs'),
+                Tables\Columns\TextColumn::make('tujuan_pengiriman')
+                    ->searchable()
+                    ->label('Tujuan Pengiriman'),
                 Tables\Columns\TextColumn::make('status_pengiriman')
                     ->searchable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        '0' => 'warning',
+                        '1' => 'success',
+                    })
+                    ->formatStateUsing(fn($state): string => $state === 1 ? 'Berhasil' : 'Gagal')
                     ->label('Status Pengiriman'),
                 Tables\Columns\TextColumn::make('review')
                     ->searchable()
                     ->label('Review'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('toggleStatus')
+                    ->icon('heroicon-m-paper-airplane')
+                    ->label(fn($record) => $record->status_pengiriman ? 'Batal' : 'Selesai')
+                    ->action(function ($record) {
+                        $record->status_pengiriman = !$record->status_pengiriman;
+                        $record->save();
+                    })
+                    ->color(fn($record) => $record->status_pengiriman === 0 ? 'bg-red-500' : 'bg-green-500'),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -104,5 +119,15 @@ class PenjualanProdukResource extends Resource
             'create' => Pages\CreatePenjualanProduk::route('/create'),
             'edit' => Pages\EditPenjualanProduk::route('/{record}/edit'),
         ];
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return 'Penjualan Produk';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

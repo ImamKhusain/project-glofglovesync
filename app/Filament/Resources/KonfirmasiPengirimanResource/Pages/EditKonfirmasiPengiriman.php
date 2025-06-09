@@ -16,4 +16,14 @@ class EditKonfirmasiPengiriman extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    public function getHeading(): string
+    {
+        return 'Edit Konfirmasi Pengiriman';
+    }
+
+    public function getBreadcrumb(): string
+    {
+        return 'Edit';
+    }
 }

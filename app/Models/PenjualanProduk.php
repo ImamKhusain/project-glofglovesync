@@ -13,6 +13,7 @@ class PenjualanProduk extends Model
         "id_pengiriman",
         "tanggal_pengiriman",
         "jumlah_pengiriman",
+        'tujuan_pengiriman',
         "status_pengiriman",
         "review",
     ];

@@ -3,21 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
     protected static ?string $navigationLabel = 'User';
     protected static ?string $navigationIcon = 'heroicon-o-user';
+    protected static ?string $slug = 'user';
+    protected static ?int $navigationSort = 10;
 
     public static function form(Form $form): Form
     {
@@ -30,8 +30,8 @@ class UserResource extends Resource
                     ->email()
                     ->required()
                     ->maxLength(255),
-                Forms\Components\TextInput::make('role')
-                    ->required(),
+                Select::make('roles')
+                    ->relationship('roles', 'name'),
                 Forms\Components\TextInput::make('password')
                     ->password()
                     ->required()
@@ -42,12 +42,14 @@ class UserResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Tidak ada user')
+            ->emptyStateDescription('Segera input user untuk ditampilkan di sini.')
             ->columns([
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')
                     ->searchable(),
-                Tables\Columns\TextColumn::make('role'),
+                Tables\Columns\TextColumn::make('roles.name'),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -84,5 +86,10 @@ class UserResource extends Resource
             'create' => Pages\CreateUser::route('/create'),
             'edit' => Pages\EditUser::route('/{record}/edit'),
         ];
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return 'User';
     }
 }

@@ -3,21 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\BahanProdukMasukResource\Pages;
-use App\Filament\Resources\BahanProdukMasukResource\RelationManagers;
 use App\Models\BahanProdukMasuk;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class BahanProdukMasukResource extends Resource
 {
     protected static ?string $model = BahanProdukMasuk::class;
     protected static ?string $navigationLabel = 'Impor';
     protected static ?string $navigationIcon = 'heroicon-o-arrow-down-on-square';
+    protected static ?string $slug = 'bahan-produk-masuk';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -38,9 +38,8 @@ class BahanProdukMasukResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->label('Supplier'),
-                Forms\Components\TextInput::make('keterangan')
+                Forms\Components\Toggle::make('keterangan')
                     ->required()
-                    ->maxLength(255)
                     ->label('Keterangan'),
             ]);
     }
@@ -48,6 +47,8 @@ class BahanProdukMasukResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Tidak ada bahan produk masuk')
+            ->emptyStateDescription('Segera input bahan produk masuk untuk ditampilkan di sini.')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
@@ -70,23 +71,28 @@ class BahanProdukMasukResource extends Resource
                     ->label('Supplier'),
                 Tables\Columns\TextColumn::make('keterangan')
                     ->searchable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        '0' => 'warning',
+                        '1' => 'success',
+                    })
+                    ->formatStateUsing(fn($state): string => $state === 1 ? 'Diterima' : 'Belum Diterima')
                     ->label('Keterangan'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Created At'),
-                Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime()
-                    ->sortable()
-                    ->toggleable(isToggledHiddenByDefault: true)
-                    ->label('Updated At'),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('toggleStatus')
+                    ->icon('heroicon-m-paper-airplane')
+                    ->label(fn($record) => $record->keterangan ? 'Batal' : 'Terima')
+                    ->action(function ($record) {
+                        $record->keterangan = !$record->keterangan;
+                        $record->save();
+                    })
+                    ->color(fn($record) => $record->keterangan === 0 ? 'bg-red-500' : 'bg-green-500'),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -109,5 +115,15 @@ class BahanProdukMasukResource extends Resource
             'create' => Pages\CreateBahanProdukMasuk::route('/create'),
             'edit' => Pages\EditBahanProdukMasuk::route('/{record}/edit'),
         ];
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return 'Bahan Baku Masuk';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }

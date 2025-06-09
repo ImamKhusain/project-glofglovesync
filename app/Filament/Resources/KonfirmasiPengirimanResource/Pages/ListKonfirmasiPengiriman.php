@@ -13,7 +13,17 @@ class ListKonfirmasiPengiriman extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            Actions\CreateAction::make(),
+            // Actions\CreateAction::make()->label("INPUT"),
         ];
+    }
+
+    public function getHeading(): string
+    {
+        return 'Konfirmasi Pengiriman';
+    }
+
+    public function getTitle(): string
+    {
+        return 'Konfirmasi Pengiriman';
     }
 }

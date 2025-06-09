@@ -3,21 +3,21 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\UpdateStockBahanBakuResource\Pages;
-use App\Filament\Resources\UpdateStockBahanBakuResource\RelationManagers;
 use App\Models\UpdateStockBahanBaku;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\Action;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class UpdateStockBahanBakuResource extends Resource
 {
     protected static ?string $model = UpdateStockBahanBaku::class;
     protected static ?string $navigationLabel = 'Update Stock';
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-list';
+    protected static ?string $slug = 'update-stock-bahan-baku';
+    protected static ?int $navigationSort = 4;
 
     public static function form(Form $form): Form
     {
@@ -35,9 +35,8 @@ class UpdateStockBahanBakuResource extends Resource
                     ->required()
                     ->numeric()
                     ->label('Stok Terbaru'),
-                Forms\Components\TextInput::make('status')
+                Forms\Components\Toggle::make('status')
                     ->required()
-                    ->maxLength(255)
                     ->label('Status'),
             ]);
     }
@@ -45,6 +44,8 @@ class UpdateStockBahanBakuResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
+            ->emptyStateHeading('Tidak ada update stock bahan baku')
+            ->emptyStateDescription('Segera input update stock bahan baku untuk ditampilkan di sini.')
             ->columns([
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
@@ -63,13 +64,28 @@ class UpdateStockBahanBakuResource extends Resource
                     ->formatStateUsing(fn($state) => $state . ' meter'),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable()
+                    ->badge()
+                    ->color(fn(string $state): string => match ($state) {
+                        '0' => 'warning',
+                        '1' => 'success',
+                    })
+                    ->formatStateUsing(fn($state): string => $state === 1 ? 'Selesai' : 'Belum Selesai')
                     ->label('Status'),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Action::make('toggleStatus')
+                    ->icon('heroicon-m-paper-airplane')
+                    ->label(fn($record) => $record->status ? 'Batal' : 'Selesai')
+                    ->action(function ($record) {
+                        $record->status = !$record->status;
+                        $record->save();
+                    })
+                    ->color(fn($record) => $record->status === 0 ? 'bg-red-500' : 'bg-green-500'),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -92,5 +108,15 @@ class UpdateStockBahanBakuResource extends Resource
             'create' => Pages\CreateUpdateStockBahanBaku::route('/create'),
             'edit' => Pages\EditUpdateStockBahanBaku::route('/{record}/edit'),
         ];
+    }
+
+    public static function getBreadcrumb(): string
+    {
+        return 'Update Stock Bahan Baku';
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::count();
     }
 }
