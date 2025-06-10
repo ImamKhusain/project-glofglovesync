@@ -20,17 +20,16 @@ class Register extends RegisterPage
             ->statePath('data');
     }
 
-    protected function handleRegistration(array $data): User
-    {
-        // Buat user seperti biasa, tanpa data role
-        $user = static::getUserModel()::create($data);
+    // protected function handleRegistration(array $data): User
+    // {
+    //     // Buat user seperti biasa, tanpa data role
+    //     $user = static::getUserModel()::create($data);
 
-        // Setelah user berhasil dibuat, tetapkan role-nya.
-        // Pastikan role 'guest' sudah ada di tabel 'roles' kamu.
-        $user->assignRole('guest');
+    //     // Setelah user berhasil dibuat, beri role-nya.
+    //     $user->assignRole('guest');
 
-        event(new Registered($user));
+    //     event(new Registered($user));
 
-        return $user;
-    }
+    //     return $user;
+    // }
 }

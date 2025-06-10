@@ -30,7 +30,10 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->login()
-            ->registration(Register::class)
+            ->brandName('GolfGloveSync')
+            ->brandLogo(asset('images/logo.png'))
+            ->brandLogoHeight('3rem')
+            // ->registration(Register::class)
             ->colors([
                 'primary' => '#6366F1',
             ])
