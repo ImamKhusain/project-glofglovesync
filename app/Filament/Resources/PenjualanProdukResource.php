@@ -5,11 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\PenjualanProdukResource\Pages;
 use App\Models\PenjualanProduk;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class PenjualanProdukResource extends Resource
 {
@@ -54,6 +57,9 @@ class PenjualanProdukResource extends Resource
             ->emptyStateHeading('Tidak ada penjualan produk')
             ->emptyStateDescription('Segera input penjualan produk untuk ditampilkan di sini.')
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('id_pengiriman')
                     ->searchable()
                     ->label('ID Pengiriman'),
@@ -84,7 +90,22 @@ class PenjualanProdukResource extends Resource
                     ->label('Review'),
             ])
             ->filters([
-                //
+                Filter::make('tanggal_pengiriman')
+                    ->form([
+                        DatePicker::make('dari tanggal'),
+                        DatePicker::make('sampai tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['dari tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_pengiriman', '>=', $date),
+                            )
+                            ->when(
+                                $data['sampai tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_pengiriman', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Action::make('toggleStatus')

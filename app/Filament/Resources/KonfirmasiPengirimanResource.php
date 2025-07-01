@@ -50,6 +50,9 @@ class KonfirmasiPengirimanResource extends Resource
             ->emptyStateHeading('Tidak ada konfirmasi pengiriman')
             ->emptyStateDescription('Segera input konfirmasi pengiriman untuk ditampilkan di sini.')
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('id_pengiriman')
                     ->searchable()
                     ->label('ID Pengiriman'),

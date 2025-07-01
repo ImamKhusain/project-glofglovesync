@@ -50,10 +50,9 @@ class BahanProdukMasukResource extends Resource
             ->emptyStateHeading('Tidak ada bahan produk masuk')
             ->emptyStateDescription('Segera input bahan produk masuk untuk ditampilkan di sini.')
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->numeric()
-                    ->sortable()
-                    ->label('No'),
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('tanggal')
                     ->dateTime()
                     ->sortable()

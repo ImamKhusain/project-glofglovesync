@@ -5,11 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\LaporanProduksiResource\Pages;
 use App\Models\LaporanProduksi;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class LaporanProduksiResource extends Resource
 {
@@ -54,10 +57,9 @@ class LaporanProduksiResource extends Resource
             ->emptyStateHeading('Tidak ada laporan produksi')
             ->emptyStateDescription('Segera input laporan produksi untuk ditampilkan di sini.')
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->numeric()
-                    ->sortable()
-                    ->label('No'),
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('tanggal_produksi')
                     ->dateTime()
                     ->sortable()
@@ -91,7 +93,22 @@ class LaporanProduksiResource extends Resource
                     ->label('Status'),
             ])
             ->filters([
-                //
+                Filter::make('tanggal_produksi')
+                    ->form([
+                        DatePicker::make('dari tanggal'),
+                        DatePicker::make('sampai tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['dari tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_produksi', '>=', $date),
+                            )
+                            ->when(
+                                $data['sampai tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('tanggal_produksi', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Action::make('toggleStatus')

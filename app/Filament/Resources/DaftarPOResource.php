@@ -50,6 +50,9 @@ class DaftarPOResource extends Resource
             ->emptyStateHeading('Tidak ada daftar PO')
             ->emptyStateDescription('Segera input daftar PO untuk ditampilkan di sini.')
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('id_po')
                     ->searchable()
                     ->label('ID PO'),

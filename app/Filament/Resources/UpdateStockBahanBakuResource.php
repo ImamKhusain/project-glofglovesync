@@ -47,6 +47,9 @@ class UpdateStockBahanBakuResource extends Resource
             ->emptyStateHeading('Tidak ada update stock bahan baku')
             ->emptyStateDescription('Segera input update stock bahan baku untuk ditampilkan di sini.')
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('id')
                     ->numeric()
                     ->sortable()

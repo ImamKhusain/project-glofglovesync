@@ -45,6 +45,9 @@ class UserResource extends Resource
             ->emptyStateHeading('Tidak ada user')
             ->emptyStateDescription('Segera input user untuk ditampilkan di sini.')
             ->columns([
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('email')

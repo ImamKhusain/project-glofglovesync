@@ -52,10 +52,9 @@ class LaporanStockBahanBakuResource extends Resource
             ->emptyStateHeading('Tidak ada laporan stock bahan baku')
             ->emptyStateDescription('Segera input laporan stock bahan baku untuk ditampilkan di sini.')
             ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->numeric()
-                    ->sortable()
-                    ->label('No'),
+                Tables\Columns\TextColumn::make('no')
+                    ->label('No')
+                    ->rowIndex(),
                 Tables\Columns\TextColumn::make('id_bahan_baku')
                     ->searchable()
                     ->label('ID Bahan Baku'),
