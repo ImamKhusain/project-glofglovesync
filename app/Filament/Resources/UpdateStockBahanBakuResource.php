@@ -5,11 +5,14 @@ namespace App\Filament\Resources;
 use App\Filament\Resources\UpdateStockBahanBakuResource\Pages;
 use App\Models\UpdateStockBahanBaku;
 use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\Action;
+use Filament\Tables\Filters\Filter;
 use Filament\Tables\Table;
+use Illuminate\Contracts\Database\Eloquent\Builder;
 
 class UpdateStockBahanBakuResource extends Resource
 {
@@ -50,10 +53,6 @@ class UpdateStockBahanBakuResource extends Resource
                 Tables\Columns\TextColumn::make('no')
                     ->label('No')
                     ->rowIndex(),
-                Tables\Columns\TextColumn::make('id')
-                    ->numeric()
-                    ->sortable()
-                    ->label('No'),
                 Tables\Columns\TextColumn::make('nama_bahan')
                     ->searchable()
                     ->label('Nama Bahan'),
@@ -65,6 +64,9 @@ class UpdateStockBahanBakuResource extends Resource
                     ->numeric()
                     ->label('Stok Terbaru')
                     ->formatStateUsing(fn($state) => $state . ' meter'),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->dateTime('d/m/Y')
+                    ->label('Tanggal Update'),
                 Tables\Columns\TextColumn::make('status')
                     ->searchable()
                     ->badge()
@@ -76,7 +78,22 @@ class UpdateStockBahanBakuResource extends Resource
                     ->label('Status'),
             ])
             ->filters([
-                //
+                Filter::make('updated_at')
+                    ->form([
+                        DatePicker::make('dari tanggal'),
+                        DatePicker::make('sampai tanggal'),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['dari tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['sampai tanggal'],
+                                fn(Builder $query, $date): Builder => $query->whereDate('updated_at', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
                 Action::make('toggleStatus')

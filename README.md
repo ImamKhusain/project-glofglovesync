@@ -20,8 +20,8 @@ Ikuti langkah-langkah berikut untuk menyiapkan dan menjalankan proyek di lingkun
 Clone repositori ini ke direktori lokal Anda:
 
 ```bash
-git clone https://github.com/ImamKhusain/project-glofglovesync.git
-cd project-glofglovesync
+git clone https://github.com/ImamKhusain/project-RPL.git
+cd project-RPL
 ```
 
 ### 2. Instalasi Dependensi PHP
